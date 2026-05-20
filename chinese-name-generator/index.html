@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🐉 中文名生成器 - Chinese Name Generator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Microsoft YaHei', 'PingFang SC', Arial, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        /* 头部 */
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding-top: 30px;
+        }
+
+        .header h1 {
+            font-size: 36px;
+            color: #ffd700;
+            margin-bottom: 10px;
+            text-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+        }
+
+        .header p {
+            font-size: 16px;
+            color: #aaa;
+            font-style: italic;
+        }
+
+        /* 输入区域 */
+        .input-section {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .input-group {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .input-group input {
+            flex: 1;
+            min-width: 250px;
+            padding: 15px 20px;
+            font-size: 18px;
+            border: 2px solid rgba(255, 215, 0, 0.3);
+            border-radius: 10px;
+            background: rgba(0, 0, 0, 0.3);
+            color: white;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        .input-group input:focus {
+            border-color: #ffd700;
+        }
+
+        .input-group input::placeholder {
+            color: #666;
+        }
+
+        .btn-generate {
+            padding: 15px 30px;
+            font-size: 18px;
+            font-weight: bold;
+            background: linear-gradient(135deg, #ffd700, #ff8c00);
+            color: #1a1a2e;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
+        }
+
+        .btn-generate:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 215, 0, 0.5);
+        }
+
+        .btn-generate:disabled {
+            background: #666;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* 加载状态 */
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #ffd700;
+        }
+
+        .loading .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid rgba(255, 215, 0, 0.3);
+            border-top-color: #ffd700;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* 结果卡片 */
+        .results {
+            display: grid;
+            gap: 20px;
+        }
+
+        .name-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .name-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(255, 215, 0, 0.2);
+        }
+
+        .name-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .name-number {
+            width: 35px;
+            height: 35px;
+            background: linear-gradient(135deg, #ffd700, #ff8c00);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: #1a1a2e;
+            font-size: 16px;
+        }
+
+        .chinese-name {
+            font-size: 28px;
+            font-weight: bold;
+            color: #ffd700;
+            text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+        }
+
+        .meaning-section {
+            margin-top: 15px;
+        }
+
+        .meaning-box {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            padding: 12px 15px;
+            margin-bottom: 10px;
+        }
+
+        .meaning-box:last-child {
+            margin-bottom: 0;
+        }
+
+        .meaning-label {
+            font-size: 12px;
+            color: #888;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .meaning-text {
+            font-size: 14px;
+            color: #eee;
+            line-height: 1.6;
+        }
+
+        .cultural-note {
+            background: rgba(255, 215, 0, 0.1);
+            border-left: 3px solid #ffd700;
+            padding: 10px 15px;
+            margin-top: 15px;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .cultural-note .meaning-text {
+            color: #ffd700;
+            font-style: italic;
+        }
+
+        /* 空状态 */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #666;
+        }
+
+        .empty-state h3 {
+            font-size: 20px;
+            margin-bottom: 10px;
+            color: #888;
+        }
+
+        .empty-state p {
+            font-size: 14px;
+        }
+
+        .empty-state .emoji {
+            font-size: 60px;
+            margin-bottom: 20px;
+        }
+
+        /* 页脚 */
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            padding: 20px;
+            color: #666;
+            font-size: 14px;
+        }
+
+        /* 响应式 */
+        @media (max-width: 600px) {
+            .header h1 {
+                font-size: 28px;
+            }
+
+            .input-group {
+                flex-direction: column;
+            }
+
+            .input-group input {
+                width: 100%;
+            }
+
+            .btn-generate {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 头部 -->
+        <div class="header">
+            <h1>🐉 中文名生成器</h1>
+            <p>Chinese Name Generator - 让外国人也能拥有有趣的中文名</p>
+        </div>
+
+        <!-- 输入区域 -->
+        <div class="input-section">
+            <div class="input-group">
+                <input type="text" id="englishName" placeholder="请输入您的英文名（如：John Smith）" maxlength="50">
+                <button class="btn-generate" onclick="generateNames()" id="generateBtn">✨ 生成中文名</button>
+            </div>
+        </div>
+
+        <!-- 结果区域 -->
+        <div id="resultsArea">
+            <div class="empty-state">
+                <div class="emoji">🎭</div>
+                <h3>准备好发现你的中文名字了吗？</h3>
+                <p>输入你的英文名，让AI为你起一个有趣的中文名！</p>
+            </div>
+        </div>
+
+        <!-- 页脚 -->
+        <div class="footer">
+            <p>🔮 基于 DeepSeek AI 驱动 | 让中华文化走向世界</p>
+        </div>
+    </div>
+
+    <script>
+        async function generateNames() {
+            const name = document.getElementById('englishName').value.trim();
+            const generateBtn = document.getElementById('generateBtn');
+            const resultsArea = document.getElementById('resultsArea');
+
+            if (!name) {
+                alert('请输入您的英文名！');
+                return;
+            }
+
+            // 显示加载状态
+            generateBtn.disabled = true;
+            generateBtn.innerHTML = '⏳ 生成中...';
+            resultsArea.innerHTML = `
+                <div class="loading">
+                    <div class="spinner"></div>
+                    <p>AI 正在为您起名字...</p>
+                </div>
+            `;
+
+            try {
+                // 调用后端 API
+                const response = await fetch('/api/generate-name', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ name: name }),
+                    timeout: 60000
+                });
+
+                const data = await response.json();
+
+                // 解析 AI 返回的 JSON
+                let parsedData;
+                if (typeof data === 'string') {
+                    // 尝试提取 JSON
+                    const match = data.match(/\{[\s\S]*\}/);
+                    if (match) {
+                        parsedData = JSON.parse(match[0]);
+                    } else {
+                        throw new Error('无法解析响应');
+                    }
+                } else {
+                    parsedData = data;
+                }
+
+                // 渲染结果
+                renderResults(parsedData.names);
+            } catch (error) {
+                console.error('Error:', error);
+                resultsArea.innerHTML = `
+                    <div class="empty-state">
+                        <div class="emoji">😢</div>
+                        <h3>生成失败</h3>
+                        <p>请稍后重试，或检查网络连接</p>
+                    </div>
+                `;
+            } finally {
+                generateBtn.disabled = false;
+                generateBtn.innerHTML = '✨ 生成中文名';
+            }
+        }
+
+        function renderResults(names) {
+            const resultsArea = document.getElementById('resultsArea');
+
+            if (!names || names.length === 0) {
+                resultsArea.innerHTML = `
+                    <div class="empty-state">
+                        <div class="emoji">🤔</div>
+                        <h3>暂无结果</h3>
+                        <p>请尝试输入其他名字</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const html = names.map((item, index) => `
+                <div class="name-card">
+                    <div class="name-header">
+                        <div class="name-number">${index + 1}</div>
+                        <div class="chinese-name">${item.chinese}</div>
+                    </div>
+                    <div class="meaning-section">
+                        <div class="meaning-box">
+                            <div class="meaning-label">中文寓意</div>
+                            <div class="meaning-text">${item.meaning_cn}</div>
+                        </div>
+                        <div class="meaning-box">
+                            <div class="meaning-label">English Meaning</div>
+                            <div class="meaning-text">${item.meaning_en}</div>
+                        </div>
+                        ${item.cultural_note ? `
+                            <div class="cultural-note">
+                                <div class="meaning-label">文化背景</div>
+                                <div class="meaning-text">${item.cultural_note}</div>
+                            </div>
+                        ` : ''}
+                    </div>
+                </div>
+            `).join('');
+
+            resultsArea.innerHTML = `<div class="results">${html}</div>`;
+        }
+
+        // 回车键触发生成
+        document.getElementById('englishName').addEventListener('keyup', (e) => {
+            if (e.key === 'Enter') {
+                generateNames();
+            }
+        });
+    </script>
+</body>
+</html>
