@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coze API 测试</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .container {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            padding: 30px;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+        }
+        .input-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #555;
+        }
+        textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            resize: vertical;
+            min-height: 100px;
+            transition: border-color 0.3s;
+            box-sizing: border-box;
+        }
+        textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        button {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+        }
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .response-area {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            min-height: 150px;
+            white-space: pre-wrap;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-size: 16px;
+            line-height: 1.8;
+            color: #333;
+        }
+        .image-container {
+            margin-top: 20px;
+            padding: 20px;
+            background: white;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            display: none;
+        }
+        .image-container img {
+            max-width: 100%;
+            max-height: 600px;
+            border-radius: 8px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+        }
+        .image-link {
+            margin-top: 15px;
+            font-size: 14px;
+            color: #666;
+        }
+        .image-link a {
+            color: #667eea;
+            text-decoration: none;
+            word-break: break-all;
+        }
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            vertical-align: middle;
+            margin-right: 8px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .success {
+            color: #28a745;
+        }
+        .error {
+            color: #dc3545;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>柴狗表情包生成器</h1>
+        
+        <div class="input-group">
+            <label for="message">输入消息内容：</label>
+            <textarea id="message" placeholder="请输入要发送的消息，例如：开心"></textarea>
+        </div>
+        
+        <button id="sendBtn" onclick="sendMessage()">
+            <span id="btnText">发送请求</span>
+        </button>
+        
+        <div class="response-area" id="response">
+            响应结果将显示在这里...
+        </div>
+        
+        <div class="image-container" id="imageContainer">
+            <img id="resultImage" src="" alt="生成的图片">
+            <div class="image-link">
+                <a id="imageLink" href="" target="_blank">点击打开原图</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'https://api.coze.cn/v3/chat';
+        const API_KEY = 'pat_9DMlg6qwq6q0icDpQg2Gnl8kz2Dggnr9PXrJYpDniHuXsFFaEK9HTD0y9XH5jS7v';
+        const BOT_ID = '7641970700890882089';
+        const USER_ID = '123123***';
+
+        // 提取 https://s.coze.cn 开头的链接
+        function extractCozeUrl(text) {
+            const urlPattern = /https:\/\/s\.coze\.cn[^\s<>"']*/g;
+            const matches = text.match(urlPattern);
+            if (matches && matches.length > 0) {
+                console.log('🎯 找到Coze链接:', matches[0]);
+                return matches[0];
+            }
+            return null;
+        }
+
+        async function sendMessage() {
+            const message = document.getElementById('message').value.trim();
+            const responseArea = document.getElementById('response');
+            const sendBtn = document.getElementById('sendBtn');
+            const btnText = document.getElementById('btnText');
+
+            if (!message) {
+                alert('请输入消息内容');
+                return;
+            }
+
+            sendBtn.disabled = true;
+            btnText.innerHTML = '<span class="loading"></span>正在发送...';
+            responseArea.innerHTML = '正在获取响应...';
+
+            try {
+                console.log('🚀 开始发送请求，消息内容:', message);
+                
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${API_KEY}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        bot_id: BOT_ID,
+                        user_id: USER_ID,
+                        stream: true,
+                        auto_save_history: true,
+                        additional_messages: [
+                            {
+                                role: 'user',
+                                content: message,
+                                content_type: 'text'
+                            }
+                        ]
+                    })
+                });
+
+                console.log('📡 响应状态:', response.status, response.statusText);
+                console.log('📋 响应头:', Object.fromEntries(response.headers.entries()));
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const reader = response.body.getReader();
+                const decoder = new TextDecoder('utf-8');
+                let rawData = '';
+                let foundUrl = null;
+                const imageContainer = document.getElementById('imageContainer');
+                const resultImage = document.getElementById('resultImage');
+                const imageLink = document.getElementById('imageLink');
+
+                console.log('🔄 开始处理流式响应...');
+
+                while (true) {
+                    const { done, value } = await reader.read();
+                    
+                    if (done) {
+                        console.log('✅ 流式响应处理完成');
+                        console.log('📦 完整原始响应:', rawData);
+                        
+                        // 最后再尝试从完整响应中提取
+                        if (!foundUrl) {
+                            foundUrl = extractCozeUrl(rawData);
+                        }
+                        
+                        break;
+                    }
+
+                    const chunk = decoder.decode(value, { stream: true });
+                    rawData += chunk;
+                    
+                    console.log('📥 收到数据块，长度:', chunk.length);
+                    
+                    // 每次收到数据块都尝试提取链接
+                    if (!foundUrl) {
+                        foundUrl = extractCozeUrl(chunk);
+                        if (foundUrl) {
+                            responseArea.innerHTML = `🎯 找到图片链接，正在加载...`;
+                            responseArea.scrollTop = responseArea.scrollHeight;
+                            
+                            // 直接将链接作为图片显示
+                            resultImage.src = foundUrl;
+                            imageLink.href = foundUrl;
+                            imageContainer.style.display = 'block';
+                            
+                            // 图片加载完成或失败的处理
+                            resultImage.onload = () => {
+                                responseArea.innerHTML = '✅ 图片加载成功！';
+                                responseArea.classList.add('success');
+                                responseArea.classList.remove('error');
+                            };
+                            resultImage.onerror = () => {
+                                responseArea.innerHTML = `⚠️ 图片可能还在生成中，请稍后刷新或点击链接查看<br><a href="${foundUrl}" target="_blank" style="color: #667eea;">${foundUrl}</a>`;
+                            };
+                        }
+                    }
+                }
+
+                if (foundUrl) {
+                    responseArea.innerHTML = `🎯 图片链接：<br><a href="${foundUrl}" target="_blank" style="color: #667eea;">${foundUrl}</a>`;
+                    resultImage.src = foundUrl;
+                    imageLink.href = foundUrl;
+                    imageContainer.style.display = 'block';
+                    responseArea.classList.add('success');
+                    responseArea.classList.remove('error');
+                } else {
+                    responseArea.innerHTML = `⚠️ 未找到 https://s.coze.cn 开头的链接<br><br>完整响应：<br><pre style="font-size: 12px; background: #eee; padding: 10px; overflow: auto; max-height: 300px;">${rawData}</pre>`;
+                    responseArea.classList.add('error');
+                    responseArea.classList.remove('success');
+                }
+
+            } catch (error) {
+                console.error('❌ 请求失败:', error);
+                responseArea.innerHTML = `❌ 请求失败: ${error.message}<br><br>请检查网络连接或API配置`;
+                responseArea.classList.add('error');
+                responseArea.classList.remove('success');
+            } finally {
+                sendBtn.disabled = false;
+                btnText.innerHTML = '发送请求';
+            }
+        }
+    </script>
+</body>
+</html>
