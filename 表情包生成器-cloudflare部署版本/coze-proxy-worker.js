@@ -36,7 +36,7 @@ async function handleRequest(request) {
       const response = await fetch('https://api.coze.cn/v3/chat', {
         method: 'POST',
         headers: {
-          'Authorization': 'Bearer pat_9DMlg6qwq6q0icDpQg2Gnl8kz2Dggnr9PXrJYpDniHuXsFFaEK9HTD0y9XH5jS7v',
+          'Authorization': 'Bearer pat_xxx',
           'Content-Type': 'application/json'
         },
         body: JSON.stringify(requestBody)
