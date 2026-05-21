@@ -3,7 +3,7 @@ const http = require('http');
 const fs = require('fs');
 const path = require('path');
 
-const API_KEY = 'sk-82cbe5465ad04868b8a1689be50cf55e';
+const API_KEY = 'sk-xxx';
 const API_HOST = 'api.deepseek.com';
 const API_PATH = '/chat/completions';
 
