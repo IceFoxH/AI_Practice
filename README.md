@@ -1,6 +1,6 @@
 # AI Practice 项目集
 
-> 探索 AI 前沿技术的实验场 —— 多 Agent 协作、RAG 检索增强生成、AI 创意工具
+> 探索 AI 前沿技术的实验场 —— 多 Agent 协作、AI 创意工具
 
 [![GitHub](https://img.shields.io/badge/GitHub-IceFoxH/AI__Practice-blue)](https://github.com/IceFoxH/AI_Practice)
 
@@ -11,7 +11,6 @@
 | 项目 | 技术栈 | 说明 |
 |------|--------|------|
 | [CrewAI 多 Agent 系统](#crewai-多-agent-系统) | Python, CrewAI, DeepSeek | 多 Agent 协作与子代理层级模式 |
-| [RAG 检索增强生成](#rag-系统) | Python, RAG, Vector Store | 基于向量库的检索增强生成（脚手架） |
 | [中文名生成器](#中文名生成器) | Node.js, DeepSeek API, HTML/CSS | 输入英文名，生成富含中国文化趣味的中文名 |
 | [表情包生成器](#表情包生成器) | HTML/CSS/JS | 纯前端表情包制作工具 |
 | [表情包生成器 (Cloudflare)](#表情包生成器-cloudflare-部署) | Cloudflare Workers, Coze Proxy | 表情包生成器的云端部署版 |
@@ -36,14 +35,6 @@ pip install crewai
 export DEEPSEEK_API_KEY="sk-xxx"
 python multi_agent.py
 ```
-
----
-
-## 📚 RAG 系统
-
-检索增强生成（Retrieval-Augmented Generation）系统脚手架，用于构建基于向量检索的知识问答应用。
-
-> 状态：项目初始化阶段
 
 ---
 
