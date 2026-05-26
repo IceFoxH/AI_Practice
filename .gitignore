@@ -49,3 +49,6 @@ Thumbs.db
 # Project specific
 vector_store/
 *.faiss
+
+# OMC/Claude Code sessions
+.omc/
