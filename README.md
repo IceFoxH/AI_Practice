@@ -1,6 +1,6 @@
 # AI Practice 项目集
 
-> 探索 AI 前沿技术的实验场 —— 多 Agent 协作、AI 创意工具
+> 探索 AI 前沿技术的实验场 —— 多 Agent 协作、AI 创意工具、智能编程助手技能开发
 
 [![GitHub](https://img.shields.io/badge/GitHub-IceFoxH/AI__Practice-blue)](https://github.com/IceFoxH/AI_Practice)
 
@@ -15,6 +15,7 @@
 | [表情包生成器](#表情包生成器) | HTML/CSS/JS | 纯前端表情包制作工具 |
 | [表情包生成器 (Cloudflare)](#表情包生成器-cloudflare-部署) | Cloudflare Workers, Coze Proxy | 表情包生成器的云端部署版 |
 | [图片字幕生成器](#图片字幕生成器) | HTML/CSS/JS | 为图片添加字幕文字的在线工具 |
+| [智能编程助手技能](#智能编程助手技能) | Trae/Claude Code Skills | 自定义技能开发与使用指南 |
 
 ---
 
@@ -74,6 +75,33 @@ node server.js
 为图片添加字幕/标题文字的在线工具，纯前端实现。
 
 - **`subtitle_generator.html`** — 直接在浏览器打开使用
+
+---
+
+## 🧠 智能编程助手技能
+
+为 Trae/Claude Code 开发的自定义技能系统。
+
+### 已安装技能 (20+)
+
+| 技能 | 功能 | 触发方式 |
+|------|------|----------|
+| `daily-report` | 自动生成工作日报，追加到日报.md | `/daily-report [补充内容]` |
+| `brainstorming` | 需求分析与方案设计 | 自动触发 |
+| `test-driven-development` | 测试驱动开发 | 自动触发 |
+| `writing-skills` | 技能创建与开发 | 手动调用 |
+| `writing-plans` | 多步骤任务规划 | 自动触发 |
+| `systematic-debugging` | 系统化调试 | 自动触发 |
+| `verification-before-completion` | 完成前验证 | 自动触发 |
+
+### 使用指南文档
+
+- **`superpowers-zh-使用指南.md`** — superpowers-zh 中文技能框架使用说明
+- **`oh-my-claudecode使用指南.md`** — Oh-My-ClaudeCode 多 AI 编排插件使用说明
+
+### 日报系统
+
+- **`日报.md`** — 工作日报记录（2026年5月18日起）
 
 ---
 
